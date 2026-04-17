@@ -6,6 +6,8 @@
       <form
         method="post"
         action="/listings/<%= listingindetail._id %>?_method=PUT"
+        novalidate
+        class="needs-validation"
       >
         <div class="mb-3">
           <label for="title" class="form-label">Title</label>
@@ -14,14 +16,17 @@
             value="<%=listingindetail.title%>"
             type="text"
             class="form-control"
+            required
           />
+          <div class="valid-feedback">Looks good!</div>
         </div>
 
         <div class="mb-3">
           <label for="description" class="form-label">Description</label>
-          <textarea name="description" class="form-control">
+          <textarea name="description" class="form-control" required>
         <%=listingindetail.description%> </textarea
           >
+          <div class="invalid-feedback">Please enter a short description</div>
         </div>
 
         <div class="mb-3">
@@ -30,6 +35,7 @@
             name="image"
             value="<%=listingindetail.image%>"
             class="form-control"
+            required
           />
         </div>
 
@@ -41,7 +47,9 @@
               value="<%=listingindetail.price%>"
               type="number"
               class="form-control"
+              required
             />
+            <div class="invalid-feedback">Enter a valid price</div>
           </div>
 
           <div class="mb-3 col-8">
@@ -50,7 +58,9 @@
               name="location"
               value="<%=listingindetail.location%>"
               class="form-control"
+              required
             />
+            <div class="invalid-feedback">Enter a valid location</div>
           </div>
         </div>
 
@@ -60,11 +70,14 @@
             name="country"
             value="<%=listingindetail.country%>"
             class="form-control"
+            required
           />
+          <div class="invalid-feedback">Enter a valid country name</div>
         </div>
 
         <button class="btn btn-dark edit-btn mt-3 edit">Edit</button>
       </form>
     </div>
   </div>
+  <script src="/js/script.js"></script>
 </body>
