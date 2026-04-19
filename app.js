@@ -15,6 +15,7 @@ app.engine("ejs", ejsMate);
 app.use(express.static(path.join(__dirname, "/public")));
 const wrapAsync = require("./utils/wrapAsync");
 const ExpressError = require("./utils/ExpressError");
+const { listingschema } = require("./schema");
 
 main()
   .then(() => {
@@ -31,6 +32,16 @@ async function main() {
 app.get("/", (req, res) => {
   res.send("working");
 });
+
+const validatelisting = (req, res, next) => {
+  let { error } = listingschema.validate(req.body);
+  if (error) {
+    let errmsg = error.details.map((el) => el.message.join(","));
+    throw new ExpressError(400, error);
+  } else {
+    next();
+  }
+};
 
 //index route
 app.get(
@@ -59,8 +70,10 @@ app.get(
 //create route
 app.post(
   "/listings",
+  validatelisting,
   wrapAsync(async (req, res) => {
     let { title, description, image, price, location, country } = req.body;
+
     const newListing = new listing(req.body);
     await newListing.save();
     res.redirect("/listings");
@@ -80,6 +93,7 @@ app.get(
 //update route
 app.put(
   "/listings/:id",
+  validatelisting,
   wrapAsync(async (req, res) => {
     let { id } = req.params;
     let { title, description, image, price, location, country } = req.body;
