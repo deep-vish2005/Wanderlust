@@ -12,7 +12,7 @@
         <div class="mb-3">
           <label for="title" class="form-label">Title</label>
           <input
-            name="title"
+            name="listing[title]"
             value="<%=listingindetail.title%>"
             type="text"
             class="form-control"
@@ -23,7 +23,7 @@
 
         <div class="mb-3">
           <label for="description" class="form-label">Description</label>
-          <textarea name="description" class="form-control" required>
+          <textarea name="listing[description]" class="form-control" required>
         <%=listingindetail.description%> </textarea
           >
           <div class="invalid-feedback">Please enter a short description</div>
@@ -32,7 +32,7 @@
         <div class="mb-3">
           <label for="image" class="form-label">Image</label>
           <input
-            name="image"
+            name="listing[image]"
             value="<%=listingindetail.image%>"
             class="form-control"
             required
@@ -43,7 +43,7 @@
           <div class="mb-3 col-4">
             <label for="price" class="form-label">Price</label>
             <input
-              name="price"
+              name="listing[price]"
               value="<%=listingindetail.price%>"
               type="number"
               class="form-control"
@@ -55,7 +55,7 @@
           <div class="mb-3 col-8">
             <label for="location" class="form-label">Location</label>
             <input
-              name="location"
+              name="listing[location]"
               value="<%=listingindetail.location%>"
               class="form-control"
               required
@@ -67,7 +67,7 @@
         <div class="mb-3">
           <label for="country" class="form-label">Country</label>
           <input
-            name="country"
+            name="listing[country]"
             value="<%=listingindetail.country%>"
             class="form-control"
             required
