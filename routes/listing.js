@@ -4,6 +4,7 @@ const listing = require("../models/listing");
 const wrapAsync = require("../utils/wrapAsync");
 const ExpressError = require("../utils/ExpressError");
 const { listingschema, reviewSchema } = require("../schema");
+const { isLoggedin } = require("../middleware");
 
 const validatelisting = (req, res, next) => {
   let { error } = listingschema.validate(req.body);
@@ -25,13 +26,14 @@ router.get(
 );
 
 //new route
-router.get("/new", (req, res) => {
+router.get("/new", isLoggedin, (req, res) => {
   res.render("listings/new.ejs");
 });
 
 //show route
 router.get(
   "/:id",
+  isLoggedin,
   wrapAsync(async (req, res) => {
     let { id } = req.params;
     const listingindetail = await listing.findById(id).populate("reviews");
@@ -45,6 +47,7 @@ router.get(
 //create route
 router.post(
   "/",
+  isLoggedin,
   validatelisting,
   wrapAsync(async (req, res) => {
     const newListing = new listing(req.body.listing);
@@ -57,6 +60,7 @@ router.post(
 //edit route
 router.get(
   "/:id/edit",
+  isLoggedin,
   wrapAsync(async (req, res) => {
     let { id } = req.params;
     const listingindetail = await listing.findById(id);
@@ -67,6 +71,7 @@ router.get(
 //update route
 router.put(
   "/:id",
+  isLoggedin,
   validatelisting,
   wrapAsync(async (req, res) => {
     let { id } = req.params;
@@ -85,6 +90,7 @@ router.put(
 //delete route
 router.delete(
   "/:id",
+  isLoggedin,
   wrapAsync(async (req, res) => {
     let { id } = req.params;
     let deletedlisting = await listing.findByIdAndDelete(id);
