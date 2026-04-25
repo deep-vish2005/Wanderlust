@@ -18,8 +18,13 @@ const wrapAsync = require("./utils/wrapAsync");
 const ExpressError = require("./utils/ExpressError");
 const { listingschema, reviewSchema } = require("./schema");
 
-const listings = require("./routes/listing");
-const reviews = require("./routes/review");
+const passport = require("passport");
+const localStrategy = require("passport-local");
+const User = require("./models/user");
+
+const listingRouter = require("./routes/listing");
+const reviewRouter = require("./routes/review");
+const userRouter = require("./routes/user");
 const session = require("express-session");
 const flash = require("connect-flash");
 
@@ -36,6 +41,13 @@ const sessionOptions = {
 };
 
 app.use(session(sessionOptions));
+
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new localStrategy(User.authenticate()));
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
 main()
   .then(() => {
@@ -66,11 +78,23 @@ const validatelisting = (req, res, next) => {
 app.use((req, res, next) => {
   res.locals.success = req.flash("success");
   res.locals.error = req.flash("error");
+  res.locals.currUser = req.user;
   next();
 });
 
-app.use("/listings", listings);
-app.use("/listings/:id/reviews", reviews);
+// app.get("/demo", async (req, res) => {
+//   let fakeuser = new User({
+//     email: "deep@gmail.com",
+//     username: "btwimdeep",
+//   });
+
+//   let registereduser = await User.register(fakeuser, "deep@1234");
+//   res.send(registereduser);
+// });
+
+app.use("/listings", listingRouter);
+app.use("/listings/:id/reviews", reviewRouter);
+app.use("/", userRouter);
 
 // app.get("/testlisting", async (req, res) => {
 //   let samplelisting = new listing({
