@@ -3,12 +3,30 @@
   <div class="row col-8 offset-2 mt-3">
     <h3><%= listingindetail.title %></h3>
     <div class="card shadow-sm border-0 rounded-4">
-      <img
-        src="<%= listingindetail.image %>"
-        class="card-img-top"
-        style="height: 400px; object-fit: cover"
-        alt="listing image"
-      />
+      <% if(listingindetail.image && listingindetail.image.length > 0){ %>
+      <div id="listingCarousel" class="carousel slide">
+  <div class="carousel-inner">
+
+    <% listingindetail.image.forEach((img, index) => { %>
+      <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
+        <img 
+          src="<%= img.url %>" 
+          class="d-block w-100"
+          style="height:400px; object-fit:cover; border-radius:12px;"/>
+      </div>
+    <% }) %>
+
+  </div>
+
+  <button class="carousel-control-prev" type="button" data-bs-target="#listingCarousel" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon"></span>
+  </button>
+
+  <button class="carousel-control-next" type="button" data-bs-target="#listingCarousel" data-bs-slide="next">
+    <span class="carousel-control-next-icon"></span>
+  </button>
+</div>
+<% } %>
       <div class="card-body">
         <p class="card-text mt-2">
           <span class="fw-semibold fs-5 d-block">
@@ -66,17 +84,16 @@
       novalidate
       class="needs-validation"
     >
-      <div class="mb-3 mt-3">
-        <label for="rating" class="form-label">Rating</label>
-        <input
-          type="range"
-          min="1"
-          max="5"
-          id="rating"
-          name="review[rating]"
-          class="form-range"
-        />
-      </div>
+      <div class="mb-4">
+  <label class="form-label fw-semibold">Rating</label>
+  <div class="star-rating">
+    <input type="radio" name="review[rating]" value="5" id="star5"><label for="star5">★</label>
+    <input type="radio" name="review[rating]" value="4" id="star4"><label for="star4">★</label>
+    <input type="radio" name="review[rating]" value="3" id="star3"><label for="star3">★</label>
+    <input type="radio" name="review[rating]" value="2" id="star2"><label for="star2">★</label>
+    <input type="radio" name="review[rating]" value="1" id="star1"><label for="star1">★</label>
+  </div>
+</div>
       <div class="mb-3 mt-3">
         <label for="comment" class="form-label">Comments</label>
         <textarea

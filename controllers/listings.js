@@ -29,6 +29,12 @@ module.exports.ShowListing = async (req, res) => {
 module.exports.NewListingCreated = async (req, res) => {
   const newListing = new listing(req.body.listing);
   newListing.owner = req.user._id;
+  if (req.files && req.files.length > 0) {
+    newListing.image = req.files.map((file) => ({
+      url: file.path,
+      filename: file.filename,
+    }));
+  }
   await newListing.save();
   req.flash("success", "New Listing Created");
   res.redirect("/listings");
@@ -42,14 +48,23 @@ module.exports.EditListing = async (req, res) => {
 
 module.exports.UpdateListing = async (req, res) => {
   let { id } = req.params;
-  const listingindetail = await listing.findByIdAndUpdate(
-    id,
-    req.body.listing,
-    {
-      new: true,
-    },
-  );
-  req.flash("success", " Listing Updated");
+
+  let listingindetail = await listing.findById(id);
+
+  // update text fields
+  Object.assign(listingindetail, req.body.listing);
+
+  //  update images properly
+  if (req.files && req.files.length > 0) {
+    listingindetail.image = req.files.map((file) => ({
+      url: file.path,
+      filename: file.filename,
+    }));
+  }
+
+  await listingindetail.save();
+
+  req.flash("success", "Listing Updated");
   res.redirect(`/listings/${id}`);
 };
 

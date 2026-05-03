@@ -9,6 +9,7 @@
         action="/listings"
         novalidate
         class="needs-validation"
+        enctype="multipart/form-data"
       >
         <div class="mb-3">
           <label for="title" class="form-label">Title</label>
@@ -35,12 +36,18 @@
         </div>
 
         <div class="mb-3">
-          <label for="image" class="form-label">Image</label>
+          <label for="image" class="form-label">Upload Image</label>
           <input
             name="listing[image]"
-            placeholder="enter image URL/Link"
+            placeholder="Upload Listing Image
             class="form-control"
+            type="file"
+            multiple
+            required
           />
+          <div class="form-text">
+  Upload up to 5 images (JPG, PNG, JPEG)
+</div>
         </div>
 
         <div class="row">
@@ -78,8 +85,17 @@
           <div class="invalid-feedback">Enter a valid country name</div>
         </div>
 
-        <button class="btn btn-dark add mt-3">Add</button>
+        <button id="submitBtn" class="btn btn-dark add mt-3">Submit</button>
       </form>
     </div>
   </div>
+  <script>
+  document.querySelector("form").addEventListener("submit", () => {
+    const btn = document.getElementById("submitBtn");
+    btn.innerText = "Uploading...";
+    btn.disabled = true;
+  });
+</script>
+
+
 </body>

@@ -156,3 +156,37 @@ body {
   transform: translateX(0);
   opacity: 1;
 }
+
+.star-rating {
+  direction: rtl;
+  display: inline-flex;
+  gap: 5px;
+}
+
+.star-rating input {
+  display: none;
+}
+
+.star-rating label {
+  font-size: 2rem;
+  color: #ddd;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.star-rating label:hover,
+.star-rating label:hover ~ label {
+  color: #ffc107;
+  transform: scale(1.2);
+}
+
+.star-rating input:checked ~ label {
+  color: #ffc107;
+}
+
+img {
+  transition: transform 0.2s ease;
+}
+img:hover {
+  transform: scale(1.05);
+}

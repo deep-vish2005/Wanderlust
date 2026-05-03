@@ -15,6 +15,10 @@ const {
   DeleteListing,
 } = require("../controllers/listings");
 
+const multer = require("multer");
+const { storage } = require("../cloudconfig");
+const upload = multer({ storage });
+
 const validatelisting = (req, res, next) => {
   let { error } = listingschema.validate(req.body);
   if (error) {
@@ -28,7 +32,12 @@ const validatelisting = (req, res, next) => {
 router
   .route("/")
   .get(wrapAsync(Index))
-  .post(isLoggedin, validatelisting, wrapAsync(NewListingCreated));
+  .post(
+    isLoggedin,
+    upload.array("listing[image]", 5),
+    validatelisting,
+    wrapAsync(NewListingCreated),
+  );
 
 //new route
 router.get("/new", isLoggedin, NewListingform);
@@ -36,7 +45,13 @@ router.get("/new", isLoggedin, NewListingform);
 router
   .route("/:id")
   .get(wrapAsync(ShowListing))
-  .put(isLoggedin, isOwner, validatelisting, wrapAsync(UpdateListing))
+  .put(
+    isLoggedin,
+    isOwner,
+    upload.array("listing[image]", 5),
+    validatelisting,
+    wrapAsync(UpdateListing),
+  )
   .delete(isLoggedin, isOwner, wrapAsync(DeleteListing));
 
 //edit route
