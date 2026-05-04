@@ -35,8 +35,34 @@ module.exports.NewListingCreated = async (req, res) => {
       filename: file.filename,
     }));
   }
+  const address = req.body.listing.location + "," + req.body.listing.country;
+
+  const geoRes = await fetch(
+    `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`,
+    {
+      headers: {
+        "User-Agent": "wanderlust-app",
+      },
+    },
+  );
+
+  const geoData = await geoRes.json();
+
+  if (!geoData || geoData.length === 0) {
+    req.flash("error", "Invalid location");
+    return res.redirect("/listings/new");
+  }
+
+  const coords = geoData[0];
+
+  newListing.geometry = {
+    type: "Point",
+    coordinates: [parseFloat(coords.lon), parseFloat(coords.lat)],
+  };
   await newListing.save();
+
   req.flash("success", "New Listing Created");
+
   res.redirect("/listings");
 };
 

@@ -28,6 +28,14 @@ const listingschema = new schema({
     type: schema.Types.ObjectId,
     ref: "User",
   },
+
+  geometry: {
+    type: {
+      type: String,
+      enum: ["Point"],
+    },
+    coordinates: [Number],
+  },
 });
 
 listingschema.post("findOneAndDeleteMany", async (listing) => {

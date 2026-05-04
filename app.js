@@ -26,6 +26,8 @@ const passport = require("passport");
 const localStrategy = require("passport-local");
 const User = require("./models/user");
 
+app.locals.GMAPS_KEY = process.env.GOOGLE_MAPS_API_KEY;
+
 const listingRouter = require("./routes/listing");
 const reviewRouter = require("./routes/review");
 const userRouter = require("./routes/user");
