@@ -5,11 +5,12 @@ if (process.env.NODE_ENV != "production") {
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
+const dns = require("dns");
+dns.setServers(["1.1.1.1", "8.8.8.8"]);
 const listing = require("./models/listing");
 const path = require("path");
 // const mongo_url = "mongodb://127.0.0.1:27017/wanderlust";
 const dburl = process.env.ATLASDB_URL;
-const port = process.env.PORT || 8080;
 const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
 const review = require("./models/review");
@@ -37,7 +38,7 @@ const session = require("express-session");
 const flash = require("connect-flash");
 
 const sessionOptions = {
-  secret: process.env.SESSION_SECRET || "devsecret",
+  secret: "mysupersecretcode",
   resave: false,
   saveUninitialized: true,
   cookie: {
@@ -67,9 +68,6 @@ main()
   });
 
 async function main() {
-  if (!dburl) {
-    throw new Error("ATLASDB_URL is not set");
-  }
   await mongoose.connect(dburl);
 }
 
@@ -136,6 +134,6 @@ app.use((err, req, res, next) => {
   res.status(statuscode).render("listings/error.ejs", { message });
 });
 
-app.listen(port, () => {
-  console.log(`server is listening on port ${port}`);
+app.listen(8080, () => {
+  console.log("server is listening to port 8080");
 });

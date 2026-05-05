@@ -30,7 +30,7 @@ module.exports.LoginForm = (req, res) => {
 
 module.exports.Login = async (req, res) => {
   req.flash("success", "Welcome back to Wanderlust");
-  const redirectUrl = res.locals.redirectUrl || "/listings";
+  redirectUrl = res.locals.redirectUrl || "/listings";
   res.redirect(redirectUrl);
 };
 
