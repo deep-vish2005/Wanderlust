@@ -1,10 +1,72 @@
 <% layout("/layouts/boilerplate") %>
 
   <body>
-    <h3>All listings</h3>
-    <!-- <form method="get" action="/listings/new">
-        <button>Create New Listing</button>
-    </form> -->
+ <div class="container-lg my-3">
+
+  <!-- Mobile Toggle Button -->
+  <button 
+    class="btn btn-outline-dark d-lg-none w-100 mb-1"
+    data-bs-toggle="collapse"
+    data-bs-target="#filterCollapse"
+  >
+    Categories
+  </button>
+
+  <!-- Filter Section -->
+  <div id="filterCollapse" class="collapse d-lg-block">
+
+    <div id="filters" class="d-flex gap-3 overflow-auto">
+
+      <div class="filter">
+        <i class="fa-solid fa-fire"></i>
+        <p>Trending</p>
+      </div>
+
+      <div class="filter">
+        <i class="fa-solid fa-bed"></i>
+        <p>Rooms</p>
+      </div>
+
+      <div class="filter">
+        <i class="fa-solid fa-mountain-city"></i>
+        <p>Iconic Cities</p>
+      </div>
+
+      <div class="filter">
+        <i class="fa-solid fa-mountain"></i>
+        <p>Mountains</p>
+      </div>
+
+      <div class="filter">
+        <i class="fa-solid fa-umbrella-beach"></i>
+        <p>Beach</p>
+      </div>
+
+      <div class="filter">
+        <i class="fa-solid fa-seedling"></i>
+        <p>Nature</p>
+      </div>
+
+      <div class="filter">
+        <i class="fa-solid fa-campground"></i>
+        <p>Camping</p>
+      </div>
+
+      <div class="filter">
+        <i class="fa-solid fa-snowflake"></i>
+        <p>Arctic</p>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+   <div class="tax-toggle">
+    <div class="form-check-reverse form-switch">
+  <input class="form-check-input" type="checkbox" role="switch" id="switchCheckDefault">
+  <label class="form-check-label" for="switchCheckDefault">Display Total After Taxes</label>
+</div>
+   </div>
 <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1">
           <% for(let listing of alllistings) { %>
             <a href="/listings/<%= listing._id%>" class="listing-link">
@@ -14,12 +76,32 @@
         <div class="card-body">
             <p class="card-text"><b><%=listing.title%></b> <br>
             &#x20B9;<%= listing.price.toLocaleString("en-IN") %> / night
+            <i class="tax-info">&nbsp; &nbsp;+18% GST</i>
             </p>
         </div>
     </div>
     </a>
     <%}%>
 </div>
+</body>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+  const taxswitch = document.getElementById("switchCheckDefault");
+
+  if (taxswitch) {
+    taxswitch.addEventListener("change", () => {
+     let taxinfo = document.getElementsByClassName("tax-info");
+      for(info of taxinfo) {
+        if(info.style.display != "inline"){
+            info.style.display = "inline";
+        }else{
+            info.style.display = "none"
+        }
+      }
+    });
+  }
+});
+</script>
   
 
 
