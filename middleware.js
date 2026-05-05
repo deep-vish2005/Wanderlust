@@ -20,19 +20,24 @@ module.exports.saveRedirectUrl = (req, res, next) => {
 module.exports.isOwner = async (req, res, next) => {
   let { id } = req.params;
   let listings = await listing.findById(id);
-  if (!listings.owner.equals(res.locals.currUser._id)) {
+
+  if (!res.locals.currUser || !listings.owner.equals(res.locals.currUser._id)) {
     req.flash("error", "You are not the owner of this listing");
     return res.redirect(`/listings/${id}`);
   }
+
   next();
 };
 
 module.exports.isReviewAuthor = async (req, res, next) => {
   let { id, reviewId } = req.params;
+
   let reviews = await review.findById(reviewId);
-  if (!reviews.author.equals(res.locals.currUser._id)) {
-    req.flash("error", "You did not created this review");
+
+  if (!res.locals.currUser || !reviews.author.equals(res.locals.currUser._id)) {
+    req.flash("error", "You did not create this review");
     return res.redirect(`/listings/${id}`);
   }
+
   next();
 };

@@ -7,7 +7,9 @@ const app = express();
 const mongoose = require("mongoose");
 const listing = require("./models/listing");
 const path = require("path");
-const mongo_url = "mongodb://127.0.0.1:27017/wanderlust";
+// const mongo_url = "mongodb://127.0.0.1:27017/wanderlust";
+const dburl = process.env.ATLASDB_URL;
+const port = process.env.PORT || 8080;
 const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
 const review = require("./models/review");
@@ -34,9 +36,8 @@ const userRouter = require("./routes/user");
 const session = require("express-session");
 const flash = require("connect-flash");
 
-app.use(flash());
 const sessionOptions = {
-  secret: "mysupersecretcode",
+  secret: process.env.SESSION_SECRET || "devsecret",
   resave: false,
   saveUninitialized: true,
   cookie: {
@@ -47,9 +48,11 @@ const sessionOptions = {
 };
 
 app.use(session(sessionOptions));
+app.use(flash());
 
 app.use(passport.initialize());
 app.use(passport.session());
+
 passport.use(new localStrategy(User.authenticate()));
 
 passport.serializeUser(User.serializeUser());
@@ -64,11 +67,18 @@ main()
   });
 
 async function main() {
-  await mongoose.connect(mongo_url);
+  if (!dburl) {
+    throw new Error("ATLASDB_URL is not set");
+  }
+  await mongoose.connect(dburl);
 }
 
 app.get("/", (req, res) => {
   res.send("working");
+});
+app.use((req, res, next) => {
+  console.log("User:", req.user);
+  next();
 });
 
 const validatelisting = (req, res, next) => {
@@ -126,6 +136,6 @@ app.use((err, req, res, next) => {
   res.status(statuscode).render("listings/error.ejs", { message });
 });
 
-app.listen(8080, () => {
-  console.log("server is listening to port 8080");
+app.listen(port, () => {
+  console.log(`server is listening on port ${port}`);
 });
