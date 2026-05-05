@@ -1,34 +1,12 @@
 const listing = require("../models/listing");
 
-const geocodeWithGoogle = async (address) => {
-  if (!process.env.GOOGLE_MAPS_API_KEY) {
-    throw new Error("GOOGLE_MAPS_API_KEY is not set");
-  }
-
-  const url = new URL("https://maps.googleapis.com/maps/api/geocode/json");
-  url.searchParams.set("address", address);
-  url.searchParams.set("key", process.env.GOOGLE_MAPS_API_KEY);
-
-  const geoRes = await fetch(url);
-  const geoData = await geoRes.json();
-
-  if (!geoRes.ok || geoData.status !== "OK" || geoData.results.length === 0) {
-    throw new Error(`Google geocoding failed: ${geoData.status || geoRes.status}`);
-  }
-
-  const location = geoData.results[0].geometry.location;
-
-  return {
-    lat: location.lat,
-    lon: location.lng,
-  };
-};
-
-const geocodeWithNominatim = async (address) => {
+const geocodeAddress = async (address) => {
   const url = new URL("https://nominatim.openstreetmap.org/search");
   url.searchParams.set("format", "jsonv2");
   url.searchParams.set("limit", "1");
+  url.searchParams.set("addressdetails", "1");
   url.searchParams.set("q", address);
+
   if (process.env.GEOCODER_EMAIL) {
     url.searchParams.set("email", process.env.GEOCODER_EMAIL);
   }
@@ -36,8 +14,10 @@ const geocodeWithNominatim = async (address) => {
   const geoRes = await fetch(url, {
     headers: {
       Accept: "application/json",
-      "User-Agent": `Wanderlust/1.0 (${process.env.GEOCODER_EMAIL || "deployed app"})`,
+      "Accept-Language": "en",
+      "User-Agent": `Wanderlust/1.0 (${process.env.GEOCODER_EMAIL || "contact unavailable"})`,
     },
+    signal: AbortSignal.timeout(10000),
   });
 
   const responseText = await geoRes.text();
@@ -61,15 +41,6 @@ const geocodeWithNominatim = async (address) => {
     lat: parseFloat(geoData[0].lat),
     lon: parseFloat(geoData[0].lon),
   };
-};
-
-const geocodeAddress = async (address) => {
-  try {
-    return await geocodeWithGoogle(address);
-  } catch (googleErr) {
-    console.error(googleErr.message);
-    return geocodeWithNominatim(address);
-  }
 };
 
 module.exports.Index = async (req, res) => {
