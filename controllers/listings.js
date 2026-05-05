@@ -1,5 +1,31 @@
 const listing = require("../models/listing");
 
+const geocodeAddress = async (address) => {
+  const url = new URL("https://nominatim.openstreetmap.org/search");
+  url.searchParams.set("format", "jsonv2");
+  url.searchParams.set("limit", "1");
+  url.searchParams.set("q", address);
+
+  const geoRes = await fetch(url, {
+    headers: {
+      Accept: "application/json",
+      "User-Agent": "Wanderlust/1.0 (deployed app)",
+    },
+  });
+
+  const responseText = await geoRes.text();
+
+  if (!geoRes.ok) {
+    throw new Error(`Location service returned ${geoRes.status}`);
+  }
+
+  try {
+    return JSON.parse(responseText);
+  } catch (err) {
+    throw new Error("Location service returned an invalid response");
+  }
+};
+
 module.exports.Index = async (req, res) => {
   const alllistings = await listing.find({});
   res.render("listings/index.ejs", { alllistings });
@@ -37,16 +63,14 @@ module.exports.NewListingCreated = async (req, res) => {
   }
   const address = req.body.listing.location + "," + req.body.listing.country;
 
-  const geoRes = await fetch(
-    `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`,
-    {
-      headers: {
-        "User-Agent": "wanderlust-app",
-      },
-    },
-  );
-
-  const geoData = await geoRes.json();
+  let geoData;
+  try {
+    geoData = await geocodeAddress(address);
+  } catch (err) {
+    console.error(err.message);
+    req.flash("error", "Location service is unavailable. Please try again.");
+    return res.redirect("/listings/new");
+  }
 
   if (!geoData || geoData.length === 0) {
     req.flash("error", "Invalid location");
