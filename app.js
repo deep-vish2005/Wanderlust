@@ -86,7 +86,7 @@ async function main() {
 }
 
 app.get("/", (req, res) => {
-  res.send("working");
+  res.redirect("/listings");
 });
 app.use((req, res, next) => {
   console.log("User:", req.user);
