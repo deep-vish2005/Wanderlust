@@ -1,15 +1,42 @@
 const listing = require("../models/listing");
 
-const geocodeAddress = async (address) => {
+const geocodeWithGoogle = async (address) => {
+  if (!process.env.GOOGLE_MAPS_API_KEY) {
+    throw new Error("GOOGLE_MAPS_API_KEY is not set");
+  }
+
+  const url = new URL("https://maps.googleapis.com/maps/api/geocode/json");
+  url.searchParams.set("address", address);
+  url.searchParams.set("key", process.env.GOOGLE_MAPS_API_KEY);
+
+  const geoRes = await fetch(url);
+  const geoData = await geoRes.json();
+
+  if (!geoRes.ok || geoData.status !== "OK" || geoData.results.length === 0) {
+    throw new Error(`Google geocoding failed: ${geoData.status || geoRes.status}`);
+  }
+
+  const location = geoData.results[0].geometry.location;
+
+  return {
+    lat: location.lat,
+    lon: location.lng,
+  };
+};
+
+const geocodeWithNominatim = async (address) => {
   const url = new URL("https://nominatim.openstreetmap.org/search");
   url.searchParams.set("format", "jsonv2");
   url.searchParams.set("limit", "1");
   url.searchParams.set("q", address);
+  if (process.env.GEOCODER_EMAIL) {
+    url.searchParams.set("email", process.env.GEOCODER_EMAIL);
+  }
 
   const geoRes = await fetch(url, {
     headers: {
       Accept: "application/json",
-      "User-Agent": "Wanderlust/1.0 (deployed app)",
+      "User-Agent": `Wanderlust/1.0 (${process.env.GEOCODER_EMAIL || "deployed app"})`,
     },
   });
 
@@ -19,10 +46,29 @@ const geocodeAddress = async (address) => {
     throw new Error(`Location service returned ${geoRes.status}`);
   }
 
+  let geoData;
   try {
-    return JSON.parse(responseText);
+    geoData = JSON.parse(responseText);
   } catch (err) {
     throw new Error("Location service returned an invalid response");
+  }
+
+  if (!geoData || geoData.length === 0) {
+    throw new Error("Nominatim found no results");
+  }
+
+  return {
+    lat: parseFloat(geoData[0].lat),
+    lon: parseFloat(geoData[0].lon),
+  };
+};
+
+const geocodeAddress = async (address) => {
+  try {
+    return await geocodeWithGoogle(address);
+  } catch (googleErr) {
+    console.error(googleErr.message);
+    return geocodeWithNominatim(address);
   }
 };
 
@@ -67,21 +113,14 @@ module.exports.NewListingCreated = async (req, res) => {
   try {
     geoData = await geocodeAddress(address);
   } catch (err) {
-    console.error(err.message);
-    req.flash("error", "Location service is unavailable. Please try again.");
+    console.error(`Geocoding failed for "${address}": ${err.message}`);
+    req.flash("error", "Could not find this location. Please check the city and country.");
     return res.redirect("/listings/new");
   }
-
-  if (!geoData || geoData.length === 0) {
-    req.flash("error", "Invalid location");
-    return res.redirect("/listings/new");
-  }
-
-  const coords = geoData[0];
 
   newListing.geometry = {
     type: "Point",
-    coordinates: [parseFloat(coords.lon), parseFloat(coords.lat)],
+    coordinates: [geoData.lon, geoData.lat],
   };
   await newListing.save();
 
