@@ -38,7 +38,7 @@ Roamingo is a full-stack travel and stay booking web application where users can
 
 * Cloudinary (Image storage)
 * Multer (File upload)
-* Mapbox (Maps & Geocoding)
+* Integrated Leaflet with OpenStreetMap to display interactive maps and location markers for property listings
 * Passport.js (Authentication)
 * Express-session & Connect-Mongo (Session storage)
 
