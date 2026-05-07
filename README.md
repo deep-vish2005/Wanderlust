@@ -1,4 +1,4 @@
-# Wanderlust 🌍
+# Roamingo 🌍
 
 A full-stack listing platform built with:
 

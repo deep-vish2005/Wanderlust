@@ -15,7 +15,7 @@ const geocodeAddress = async (address) => {
     headers: {
       Accept: "application/json",
       "Accept-Language": "en",
-      "User-Agent": `Wanderlust/1.0 (${process.env.GEOCODER_EMAIL || "contact unavailable"})`,
+      "User-Agent": `Roamingo/1.0 (${process.env.GEOCODER_EMAIL || "contact unavailable"})`,
     },
     signal: AbortSignal.timeout(10000),
   });

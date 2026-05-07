@@ -14,7 +14,7 @@ module.exports.SignUp = async (req, res, next) => {
       if (err) {
         return next(err);
       }
-      req.flash("success", "Welcome to Wanderlust");
+      req.flash("success", "Welcome to Roamingo");
       res.redirect("/listings");
     });
   } catch (e) {
@@ -29,7 +29,7 @@ module.exports.LoginForm = (req, res) => {
 };
 
 module.exports.Login = async (req, res) => {
-  req.flash("success", "Welcome back to Wanderlust");
+  req.flash("success", "Welcome back to Roamingo");
   redirectUrl = res.locals.redirectUrl || "/listings";
   res.redirect(redirectUrl);
 };
